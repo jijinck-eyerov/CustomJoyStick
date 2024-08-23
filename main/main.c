@@ -165,7 +165,7 @@ static void read_joystick_task(void *pvParameter)
 {
     int8_t js1x,js1y,js2x,js2y,js3x,js3y;
 
-    uint32_t current_sum;
+    uint64_t current_sum;
 
     uint16_t buttons = 0;
     uint32_t last_sum = 0;
@@ -182,15 +182,15 @@ static void read_joystick_task(void *pvParameter)
             buttons = ev.state;
         }
 
-        js1x = (int8_t)((readJoystickChannel(ADC1_CHANNEL_3)/16)-128);
-        js1y = (int8_t)((readJoystickChannel(ADC1_CHANNEL_4)/16)-128);
-        js2x = (int8_t)((readJoystickChannel(ADC1_CHANNEL_5)/16)-128);
-        js2y = (int8_t)((readJoystickChannel(ADC1_CHANNEL_6)/16)-128);
-        js3x = (int8_t)((readJoystickChannel(ADC1_CHANNEL_7)/16)-128);
-        js3y = (int8_t)((readJoystickChannel(ADC1_CHANNEL_8)/16)-128);
+        js1x = (int8_t)((readJoystickChannel(ADC1_CHANNEL_3)/8)-128);
+        js1y = (int8_t)((readJoystickChannel(ADC1_CHANNEL_4)/8)-128);
+        js2x = (int8_t)((readJoystickChannel(ADC1_CHANNEL_5)/8)-128);
+        js2y = (int8_t)((readJoystickChannel(ADC1_CHANNEL_6)/8)-128);
+        js3x = (int8_t)((readJoystickChannel(ADC1_CHANNEL_7)/8)-128);
+        js3y = (int8_t)((readJoystickChannel(ADC1_CHANNEL_8)/8)-128);
         
         // very simple checksum :)
-        current_sum = (js2x<<24) + (js2y<<16) + (js1x<<8) + js1y;
+        current_sum = (js3x<<40) + (js3y<<32) +(js2x<<24) + (js2y<<16) + (js1x<<8) + js1y;
 
         ESP_LOGD(HID_JOYSTICK_TAG, "last_sum %ld", last_sum);
         
