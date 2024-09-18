@@ -154,10 +154,16 @@ static void app_send_hid_demo(void)
 
 static int readJoystickChannel(adc1_channel_t channel)
 {
+    uint32_t adc_value=0, sample_count=5;
     adc1_config_width(ADC_WIDTH_BIT_12);                  //Range 0-1023
     adc1_config_channel_atten(channel, ADC_ATTEN_DB_11);  //ADC_ATTEN_DB_11 = 0-3,6V
     // return (uint8_t)(adc1_get_raw(channel) >> 2);         //Read analog and shift to 0-255
-    return (adc1_get_raw(channel));         //Read analog and shift to 0-255
+    for (int i =0;i<sample_count; i++)
+    {
+        adc_value+= adc1_get_raw(channel);
+    }
+
+    return ((int)(adc_value/sample_count));         //Read analog and shift to 0-255
 
 }
 
@@ -182,12 +188,19 @@ static void read_joystick_task(void *pvParameter)
             buttons = ev.state;
         }
 
-        js1x = (int8_t)((readJoystickChannel(ADC1_CHANNEL_3)/8)-128);
-        js1y = (int8_t)((readJoystickChannel(ADC1_CHANNEL_4)/8)-128);
-        js2x = (int8_t)((readJoystickChannel(ADC1_CHANNEL_5)/8)-128);
-        js2y = (int8_t)((readJoystickChannel(ADC1_CHANNEL_6)/8)-128);
-        js3x = (int8_t)((readJoystickChannel(ADC1_CHANNEL_7)/8)-128);
-        js3y = (int8_t)((readJoystickChannel(ADC1_CHANNEL_8)/8)-128);
+        js1x = (int8_t)((readJoystickChannel(ADC1_CHANNEL_3)/16)-90)/5;
+        js1y = (int8_t)((readJoystickChannel(ADC1_CHANNEL_4)/16)-90)/5;
+        js2x = (int8_t)((readJoystickChannel(ADC1_CHANNEL_5)/16)-90)/5;
+        js2y = (int8_t)((readJoystickChannel(ADC1_CHANNEL_6)/16)-90)/5;
+        js3x = (int8_t)((readJoystickChannel(ADC1_CHANNEL_7)/16)-90)/5;
+        js3y = (int8_t)((readJoystickChannel(ADC1_CHANNEL_8)/16)-90)/5;
+        
+        js1x *= 5;
+        js1y *= 5;
+        js2x *= 5;
+        js2y *= 5;
+        js3x *= 5;
+        js3y *= 5;
         
         // very simple checksum :)
         current_sum = (js3x<<40) + (js3y<<32) +(js2x<<24) + (js2y<<16) + (js1x<<8) + js1y;
